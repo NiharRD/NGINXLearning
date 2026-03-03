@@ -144,3 +144,5 @@ vite.config.ts.timestamp-*
 .vite/
 sshPairCICD
 sshPairCICD.pub
+id_rsa
+id_rsa.pub
