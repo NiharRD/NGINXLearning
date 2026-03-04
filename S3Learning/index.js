@@ -1,4 +1,8 @@
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  GetObjectCommand,
+  PutObjectCommand,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { config } from "dotenv";
 config();
@@ -22,9 +26,39 @@ async function generatePresignedUrl(bucketName, key, expiresInSeconds) {
   return url;
 }
 
-const url = await generatePresignedUrl(
+async function getUrlofAlreadyExistingObject() {
+  const url = await generatePresignedUrl(
+    "privatebuckets3learningnihardev",
+    "upload/file/firstUpload.jpeg",
+    300, // expires in 5 minutes
+  );
+  console.log("Presigned URL:", url);
+  return url;
+}
+
+async function uploadObjectToS3SignedURL(
+  bucketName,
+  key,
+  expiresInSeconds,
+  type,
+) {
+  const command = new PutObjectCommand({
+    Bucket: bucketName,
+    Key: key,
+    ContentType: type,
+  });
+
+  const url = await getSignedUrl(s3Client, command, {
+    expiresIn: expiresInSeconds,
+  });
+  console.log("Presigned URL for upload:", url);
+  return url;
+}
+
+getUrlofAlreadyExistingObject();
+uploadObjectToS3SignedURL(
   "privatebuckets3learningnihardev",
-  "laptopScreen.jpeg",
-  300, // expires in 5 minutes
+  "upload/file/firstUpload.jpeg", // key  i.e we will name it using file type.
+  300,
+  "image/jpeg",
 );
-console.log("Generated presigned URL:", url);
